@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="form-card">
+      <div class="form-title">로그인</div>
+      <div class="form-sub">아이들이 인증한 과제를 관리하려면 먼저 로그인 해주세요.</div>
+
+      <div class="form-group">
+        <label class="form-label">아이디</label>
+        <input type="text" id="login-userId" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input type="password" id="login-password" class="form-input" />
+      </div>
+
+      <div class="form-footer">
+        <button id="login-btn" class="btn btn-primary">로그인</button>
+        <div class="form-links">
+          <a href="signup.html">회원가입</a>
+          <a href="#" id="open-find-id">아이디 찾기</a>
+          <a href="#" id="open-reset-pw">비밀번호 재설정</a>
+        </div>
+      </div>
+
+      <p id="login-msg" class="msg msg-error"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

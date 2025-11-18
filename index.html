@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>평내 에듀플렉스 과제제출</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <!-- 헤더: 제목 + 날짜 -->
+      <header class="app-header" style="flex-direction: column; align-items: center;">
+        <div class="app-title" style="text-align:center;">
+          <div class="app-title-main" style="font-size: 26px;">평내 에듀플렉스 과제제출</div>
+          <div class="app-title-sub">제출한 과제를 확인할 수 있어요.</div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <div class="app-date-pill">
+            오늘 날짜: <span id="today"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- 🔹 로그인/회원가입 (왼쪽) + 과제제출하기 버튼(오른쪽) 한 줄 -->
+      <div class="main-top-row" style="margin-top: 18px;">
+        <!-- 왼쪽: 로그인/회원가입/마이페이지/관리자 -->
+        <nav class="nav-bar" id="auth-area">
+          <a href="login.html" id="login-link">로그인</a>
+          <a href="signup.html" id="signup-link">회원가입</a>
+          <span id="welcome-user" style="display:none;"></span>
+          <a href="mypage.html" id="mypage-link" style="display:none;">마이페이지</a>
+          <a href="admin.html" id="admin-link" style="display:none;">관리자</a>
+        </nav>
+
+        <!-- 오른쪽: 과제 제출 버튼 -->
+        <button id="write-btn" class="btn btn-primary">
+          ✏️ 과제 제출하기
+        </button>
+      </div>
+
+      <!-- 리스트 영역 -->
+      <section style="margin-top: 10px;">
+        <div class="section-title">제출된 과제 목록</div>
+        <div id="posts" class="post-list"></div>
+        <div id="empty-state" class="empty-state" style="display:none;">
+          아직 제출된 과제가 없습니다. 첫 번째 인증샷의 주인공이 되어보세요!
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

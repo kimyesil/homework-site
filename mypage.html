@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <!-- 헤더 -->
+      <header class="app-header">
+        <div class="app-title">
+          <div class="app-title-main">마이페이지</div>
+          <div class="app-title-sub">나에게 배부된 과제와 학습 미션을 한 눈에 확인할 수 있어요.</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+          <div class="app-date-pill">
+            오늘 날짜: <span id="today"></span>
+          </div>
+          <nav class="nav-bar">
+            <a href="index.html">메인으로</a>
+            <a href="write.html">과제 제출</a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- 기본 정보 -->
+      <section style="margin-bottom:18px;">
+        <div class="section-title">내 정보</div>
+        <div id="user-info" class="main-summary">
+          <!-- mypage.js에서 채움 -->
+        </div>
+      </section>
+
+      <!-- 제출 예정 과제 -->
+      <section>
+        <div class="section-title">제출 예정 과제</div>
+        <div id="assign-list" class="post-list"></div>
+        <div id="assign-empty" class="empty-state" style="display:none;">
+          제출 예정인 과제가 없습니다. 매니저가 배부하는 과제가 이곳에 표시됩니다.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/mypage.js"></script>
+</body>
+</html>

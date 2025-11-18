@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 페이지</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <!-- 헤더 -->
+      <header class="app-header">
+        <div class="app-title">
+          <div class="app-title-main">관리자 대시보드</div>
+          <div class="app-title-sub">회원 관리 · 과제 배부 · 제출 파일 정리를 한 번에 관리합니다.</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+          <div class="app-date-pill">
+            오늘 날짜: <span id="today"></span>
+          </div>
+          <nav class="nav-bar">
+            <a href="index.html">메인으로</a>
+            <a href="mypage.html">마이페이지</a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- 관리자 인사말 -->
+      <section style="margin-bottom:18px;">
+        <div id="admin-header" class="main-summary">
+          <!-- admin.js에서 채움 -->
+        </div>
+      </section>
+
+      <!-- 회원 목록 + 과제 배부 -->
+      <section style="margin-bottom:24px;">
+        <div class="section-title">회원 목록 & 과제 배부</div>
+        <div id="user-list" class="post-list"></div>
+      </section>
+
+      <!-- 과제 제출 글 관리 -->
+      <section>
+        <div class="section-title">과제 제출 글 관리</div>
+        <div id="post-list" class="post-list"></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
