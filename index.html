@@ -1,345 +1,184 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>평내 에듀플렉스 과제제출 - 로그인</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #e0f2fe, #f5f5ff);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 24px 28px 28px;
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
-    }
-    h1 {
-      margin: 0;
-      font-size: 22px;
-      text-align: center;
-    }
-    .subtitle {
-      margin-top: 6px;
-      margin-bottom: 20px;
-      font-size: 13px;
-      color: #6b7280;
-      text-align: center;
-    }
-    label {
-      display: block;
-      margin-top: 8px;
-      margin-bottom: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-    }
-    input {
-      width: 100%;
-      padding: 9px 10px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-    input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
-    }
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    button {
-      flex: 1;
-      padding: 9px 10px;
-      border-radius: 999px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    #login-btn {
-      background: #2563eb;
-      color: #fff;
-    }
-    #signup-btn {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    .status {
-      margin-top: 12px;
-      font-size: 13px;
-      min-height: 18px;
-    }
-    .status.error { color: #dc2626; }
-    .status.ok { color: #16a34a; }
+<meta charset="UTF-8">
+<title>평내 에듀플렉스 과제제출</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    /* 로그인된 상태 카드 */
-    .hidden { display: none; }
-    .logged-card-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 4px 0 2px;
-    }
-    .logged-small {
-      font-size: 13px;
-      color: #6b7280;
-      margin: 0 0 10px;
-    }
-    .logged-btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .btn-go {
-      background: #2563eb;
-      color: #fff;
-    }
-    .btn-logout-main {
-      background: #f97316;
-      color: #fff;
-    }
-  </style>
+<style>
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: #eef2ff;
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 750px;
+  background: #fff;
+  padding: 30px 35px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.08);
+}
+h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+}
+.subtitle {
+  font-size: 14px;
+  text-align: center;
+  color: #6b7280;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+.button-main {
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+.form {
+  margin-top: 20px;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #d4d4d8;
+  font-size: 14px;
+}
+textarea {
+  height: 120px;
+  resize: none;
+}
+.post-card {
+  background: #f9fafb;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.post-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+.post-meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
+<div class="container">
+  <h1>평내 에듀플렉스 과제제출</h1>
+  <p class="subtitle">과제를 제출하고 제출된 목록을 확인할 수 있어요.</p>
 
-    <!-- ✅ 1) 로그인/회원가입 카드 -->
-    <div id="login-card">
-      <h1>평내 에듀플렉스 과제제출</h1>
-      <p class="subtitle">회원가입 후 로그인해서 과제를 제출하세요.</p>
+  <!-- 과제 제출 버튼 -->
+  <button class="button-main" id="openFormBtn">과제 제출하기</button>
 
-      <label for="name">이름</label>
-      <input type="text" id="name" placeholder="예: 김에듀" />
+  <!-- 글쓰기 폼 -->
+  <div class="form" id="formBox">
+    <input id="school" placeholder="학교/학년 (예: 에듀중2)">
+    <input id="name" placeholder="이름">
+    <textarea id="content" placeholder="전달 내용을 입력하세요"></textarea>
+    <input type="file" id="fileInput" accept="image/*,video/*">
 
-      <label for="email">이메일</label>
-      <input type="email" id="email" placeholder="이메일 입력" />
-
-      <label for="password">비밀번호</label>
-      <input type="password" id="password" placeholder="비밀번호 입력" />
-
-      <div class="btn-row">
-        <button id="login-btn">로그인</button>
-        <button id="signup-btn">회원가입</button>
-      </div>
-
-      <div class="status" id="status"></div>
-    </div>
-
-    <!-- ✅ 2) 이미 로그인된 상태 카드 (로그아웃 버튼 포함) -->
-    <div id="logged-card" class="hidden">
-      <h1>평내 에듀플렉스 과제제출</h1>
-      <p class="subtitle">현재 로그인된 계정 정보입니다.</p>
-
-      <div class="logged-card-title" id="logged-name">
-        <!-- 이름/이메일 -->
-      </div>
-      <p class="logged-small" id="logged-role">
-        <!-- 역할 -->
-      </p>
-
-      <div class="logged-btn-row">
-        <button class="btn-go" id="goto-btn">마이페이지로 가기</button>
-        <button class="btn-logout-main" id="logout-main-btn">로그아웃</button>
-      </div>
-
-      <div class="status" id="status-logged"></div>
-    </div>
-
+    <button class="button-main" id="submitPost">제출하기</button>
   </div>
 
-  <script>
-    const SUPABASE_URL = "https://kxbyfldxcrdegnfmzgrm.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4YnlmbGR4Y3JkZWduZm16Z3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NDU4MDMsImV4cCI6MjA3OTAyMTgwM30.Fj_TNEHxWnHY4TbmGEFzowUJp-5X9Gn7-0eynr8cVr4";
-    const { createClient } = supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <h2 style="margin-top:30px;">📌 제출된 과제 목록</h2>
+  <div id="postList"></div>
+</div>
 
-    // 요소들 가져오기
-    const loginCard = document.getElementById("login-card");
-    const loggedCard = document.getElementById("logged-card");
+<script>
+const SUPABASE_URL = "https://kxbyfldxcrdegnfmzgrm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4YnlmbGR4Y3JkZWduZm16Z3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NDU4MDMsImV4cCI6MjA3OTAyMTgwM30.Fj_TNEHxWnHY4TbmGEFzowUJp-5X9Gn7-0eynr8cVr4";   
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const nameInput = document.getElementById("name");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const loginBtn = document.getElementById("login-btn");
-    const signupBtn = document.getElementById("signup-btn");
-    const statusEl = document.getElementById("status");
+const openFormBtn = document.getElementById("openFormBtn");
+const formBox = document.getElementById("formBox");
+const submitPost = document.getElementById("submitPost");
 
-    const loggedNameEl = document.getElementById("logged-name");
-    const loggedRoleEl = document.getElementById("logged-role");
-    const gotoBtn = document.getElementById("goto-btn");
-    const logoutMainBtn = document.getElementById("logout-main-btn");
-    const statusLoggedEl = document.getElementById("status-logged");
+openFormBtn.onclick = () => {
+  formBox.style.display = formBox.style.display === "flex" ? "none" : "flex";
+};
 
-    function setStatus(msg, type = "") {
-      statusEl.textContent = msg || "";
-      statusEl.classList.remove("error", "ok");
-      if (type) statusEl.classList.add(type);
+submitPost.onclick = async () => {
+  const school = document.getElementById("school").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const content = document.getElementById("content").value.trim();
+  const file = document.getElementById("fileInput").files[0];
+
+  if (!school || !name || !content) {
+    alert("모든 내용을 입력해주세요!");
+    return;
+  }
+
+  let fileUrl = null;
+
+  if (file) {
+    const fileName = Date.now() + "_" + file.name;
+    const { data, error } = await db.storage.from("uploads")
+      .upload(fileName, file);
+
+    if (!error) {
+      fileUrl = `${SUPABASE_URL}/storage/v1/object/public/uploads/${fileName}`;
     }
+  }
 
-    function setStatusLogged(msg, type = "") {
-      statusLoggedEl.textContent = msg || "";
-      statusLoggedEl.classList.remove("error", "ok");
-      if (type) statusLoggedEl.classList.add(type);
-    }
+  const { error } = await db.from("posts").insert({
+    school, name, content, file_url: fileUrl
+  });
 
-    function showLoginCard() {
-      loginCard.classList.remove("hidden");
-      loggedCard.classList.add("hidden");
-      nameInput.value = "";
-      emailInput.value = "";
-      passwordInput.value = "";
-      setStatus("");
-      setStatusLogged("");
-    }
+  if (!error) {
+    alert("제출되었습니다!");
+    formBox.style.display = "none";
+    loadPosts();
+  }
+};
 
-    function showLoggedCard(profile, user) {
-      loginCard.classList.add("hidden");
-      loggedCard.classList.remove("hidden");
-      loggedNameEl.textContent =
-        (profile.name || user.email) + " 님이 로그인 중입니다.";
-      loggedRoleEl.textContent =
-        profile.role === "admin"
-          ? "역할: 관리자 (관리자 페이지로 이동할 수 있습니다.)"
-          : "역할: 학생 (마이페이지로 이동할 수 있습니다.)";
+// 게시글 목록 불러오기
+async function loadPosts() {
+  const { data } = await db
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-      // 이동 버튼 동작 설정
-      if (profile.role === "admin") {
-        gotoBtn.textContent = "관리자 페이지로 가기";
-        gotoBtn.onclick = () => (window.location.href = "admin.html");
-      } else {
-        gotoBtn.textContent = "마이페이지로 가기";
-        gotoBtn.onclick = () => (window.location.href = "mypage.html");
-      }
-    }
+  const box = document.getElementById("postList");
+  box.innerHTML = "";
 
-    // ✅ 1) 페이지 처음 들어왔을 때: 로그인 상태 확인
-    async function refreshUI() {
-      const { data, error } = await sb.auth.getUser();
-      if (error || !data.user) {
-        showLoginCard();
-        return;
-      }
+  data.forEach(post => {
+    const div = document.createElement("div");
+    div.className = "post-card";
+    div.onclick = () => {
+      window.location.href = `view.html?id=${post.id}`;
+    };
+    div.innerHTML = `
+      <div class="post-title">${post.school} - ${post.name}</div>
+      <div class="post-meta">${new Date(post.created_at).toLocaleString()}</div>
+    `;
+    box.appendChild(div);
+  });
+}
 
-      const user = data.user;
-
-      const { data: profile, error: pErr } = await sb
-        .from("profiles")
-        .select("name, role")
-        .eq("id", user.id)
-        .single();
-
-      if (pErr || !profile) {
-        // 프로필 없으면 로그인폼 보여주고 에러 띄우기
-        showLoginCard();
-        setStatus("프로필 정보를 찾을 수 없습니다. 관리자에게 문의하세요.", "error");
-        return;
-      }
-
-      showLoggedCard(profile, user);
-    }
-
-    // ✅ 2) 로그인 버튼
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-
-      if (!email || !password) {
-        setStatus("이메일과 비밀번호를 입력해 주세요.", "error");
-        return;
-      }
-
-      setStatus("로그인 중...", "ok");
-
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        setStatus("로그인 실패: " + error.message, "error");
-        return;
-      }
-
-      const user = data.user;
-      const { data: profile, error: pErr } = await sb
-        .from("profiles")
-        .select("role, name")
-        .eq("id", user.id)
-        .single();
-
-      if (pErr || !profile) {
-        setStatus("프로필 정보가 없습니다. 관리자에게 문의하세요.", "error");
-        return;
-      }
-
-      // 로그인 성공 후: 바로 각 페이지로 이동 (기존 동작 유지)
-      if (profile.role === "admin") {
-        window.location.href = "admin.html";
-      } else {
-        window.location.href = "mypage.html";
-      }
-    });
-
-    // ✅ 3) 회원가입 버튼
-    signupBtn.addEventListener("click", async () => {
-      const name = nameInput.value.trim();
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-
-      if (!name || !email || !password) {
-        setStatus("이름, 이메일, 비밀번호를 모두 입력해 주세요.", "error");
-        return;
-      }
-
-      setStatus("회원가입 중...", "ok");
-
-      const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) {
-        setStatus("회원가입 실패: " + error.message, "error");
-        return;
-      }
-
-      const user = data.user;
-      if (!user) {
-        setStatus("회원가입은 되었지만 이메일 인증이 필요할 수 있습니다.", "ok");
-        return;
-      }
-
-      const { error: pErr } = await sb.from("profiles").insert({
-        id: user.id,
-        name: name,
-        role: "student"
-      });
-
-      if (pErr) {
-        console.error(pErr);
-        setStatus("회원가입은 되었지만 프로필 저장 중 오류가 발생했습니다.", "error");
-        return;
-      }
-
-      setStatus("회원가입 완료! 이제 로그인 버튼을 눌러 접속하세요.", "ok");
-    });
-
-    // ✅ 4) 메인 화면에서 로그아웃 버튼
-    logoutMainBtn.addEventListener("click", async () => {
-      await sb.auth.signOut();
-      setStatusLogged("로그아웃되었습니다.", "ok");
-      // UI 다시 리셋
-      showLoginCard();
-    });
-
-    // 처음 로드 시 UI 세팅
-    refreshUI();
-  </script>
+loadPosts();
+</script>
 </body>
 </html>
