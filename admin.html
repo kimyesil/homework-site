@@ -2,53 +2,236 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>관리자 페이지</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>관리자 페이지 - 평내 에듀플렉스 과제제출</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+    }
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title { font-size: 18px; font-weight: 600; }
+    .small { font-size: 13px; color: #e5e7eb; }
+    main {
+      max-width: 960px;
+      margin: 20px auto 32px;
+      padding: 0 16px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-top: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+    }
+    th, td {
+      padding: 10px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f3f4f6;
+      text-align: left;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .status { margin-top: 10px; font-size: 13px; min-height: 18px; }
+    .status.error { color: #dc2626; }
+    .status.ok { color: #16a34a; }
+    .btn-logout {
+      border: none; border-radius: 999px; padding: 6px 12px; font-size: 13px;
+      background: #f97316; color:#fff; cursor:pointer;
+    }
+    .btn-assign {
+      border: none; border-radius: 999px; padding: 4px 10px; font-size: 12px;
+      background: #2563eb; color:#fff; cursor:pointer;
+    }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <div class="card">
-      <!-- 헤더 -->
-      <header class="app-header">
-        <div class="app-title">
-          <div class="app-title-main">관리자 대시보드</div>
-          <div class="app-title-sub">회원 관리 · 과제 배부 · 제출 파일 정리를 한 번에 관리합니다.</div>
-        </div>
-        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-          <div class="app-date-pill">
-            오늘 날짜: <span id="today"></span>
-          </div>
-          <nav class="nav-bar">
-            <a href="index.html">메인으로</a>
-            <a href="mypage.html">마이페이지</a>
-          </nav>
-        </div>
-      </header>
-
-      <!-- 관리자 인사말 -->
-      <section style="margin-bottom:18px;">
-        <div id="admin-header" class="main-summary">
-          <!-- admin.js에서 채움 -->
-        </div>
-      </section>
-
-      <!-- 회원 목록 + 과제 배부 -->
-      <section style="margin-bottom:24px;">
-        <div class="section-title">회원 목록 & 과제 배부</div>
-        <div id="user-list" class="post-list"></div>
-      </section>
-
-      <!-- 과제 제출 글 관리 -->
-      <section>
-        <div class="section-title">과제 제출 글 관리</div>
-        <div id="post-list" class="post-list"></div>
-      </section>
+  <header>
+    <div>
+      <div class="title">관리자 페이지</div>
+      <div class="small">학생 목록 · 과제 배부</div>
     </div>
-  </div>
+    <div>
+      <span id="admin-email" style="font-size:13px;margin-right:10px;"></span>
+      <button class="btn-logout" id="logout-btn">로그아웃</button>
+    </div>
+  </header>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/admin.js"></script>
+  <main>
+    <h2>회원가입한 학생 목록</h2>
+    <p style="font-size:13px;color:#6b7280;">각 학생 옆의 [과제 배부] 버튼을 눌러 기한과 내용을 입력하세요.</p>
+
+    <div class="status" id="status"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>이름</th>
+          <th>역할</th>
+          <th>이메일</th>
+          <th>과제 배부</th>
+        </tr>
+      </thead>
+      <tbody id="students-tbody">
+        <!-- JS로 채움 -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+   const SUPABASE_URL = "https://kxbyfldxcrdegnfmzgrm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4YnlmbGR4Y3JkZWduZm16Z3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NDU4MDMsImV4cCI6MjA3OTAyMTgwM30.Fj_TNEHxWnHY4TbmGEFzowUJp-5X9Gn7-0eynr8cVr4";  
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const adminEmailSpan = document.getElementById("admin-email");
+    const logoutBtn = document.getElementById("logout-btn");
+    const statusEl = document.getElementById("status");
+    const tbody = document.getElementById("students-tbody");
+
+    function setStatus(msg, type="") {
+      statusEl.textContent = msg || "";
+      statusEl.classList.remove("error","ok");
+      if (type) statusEl.classList.add(type);
+    }
+
+    async function requireAdmin() {
+      const { data, error } = await sb.auth.getUser();
+      if (error || !data.user) {
+        window.location.href = "index.html";
+        return null;
+      }
+      const user = data.user;
+      adminEmailSpan.textContent = user.email;
+
+      const { data: profile, error: pErr } = await sb
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (pErr || !profile || profile.role !== "admin") {
+        window.location.href = "mypage.html";
+        return null;
+      }
+
+      return user;
+    }
+
+    async function loadStudents() {
+      setStatus("학생 목록 불러오는 중...", "ok");
+
+      const { data, error } = await sb
+        .from("profiles")
+        .select("id, name, role, auth_users(email)")
+        .eq("role", "student")
+        .order("name", { ascending: true });
+
+      // 위 select는 Supabase에서 auth_users 뷰를 켜야 쓸 수 있음.
+      // 만약 오류가 나면, 아래처럼 email 없이 다시 요청해도 됨.
+
+      if (error) {
+        console.warn("복잡 select 실패, 단순 쿼리로 재시도:", error);
+        const { data: data2, error: err2 } = await sb
+          .from("profiles")
+          .select("id, name, role")
+          .eq("role", "student")
+          .order("name", { ascending: true });
+
+        if (err2) {
+          console.error(err2);
+          setStatus("학생 목록을 불러오지 못했습니다.", "error");
+          return;
+        }
+        renderStudents(data2);
+        setStatus("");
+        return;
+      }
+
+      renderStudents(data);
+      setStatus("");
+    }
+
+    function renderStudents(students) {
+      tbody.innerHTML = "";
+      students.forEach((s) => {
+        const tr = document.createElement("tr");
+        const tdName = document.createElement("td");
+        const tdRole = document.createElement("td");
+        const tdEmail = document.createElement("td");
+        const tdAction = document.createElement("td");
+
+        tdName.textContent = s.name || "(이름 없음)";
+        tdRole.textContent = s.role;
+        tdEmail.textContent = s.email || "-";
+
+        const btn = document.createElement("button");
+        btn.textContent = "과제 배부";
+        btn.className = "btn-assign";
+        btn.addEventListener("click", () => assignHomework(s));
+
+        tdAction.appendChild(btn);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdRole);
+        tr.appendChild(tdEmail);
+        tr.appendChild(tdAction);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function assignHomework(student) {
+      const title = prompt(`[${student.name}]에게 배부할 과제 제목을 입력하세요.`);
+      if (!title) return;
+
+      const description = prompt("과제 내용을 입력하세요. (선택)");
+      const due = prompt("제출 기한(예: 2025-12-31)을 입력하세요. (선택)");
+
+      const { error } = await sb.from("homework_assignments").insert({
+        student_id: student.id,
+        title,
+        description,
+        due_date: due || null,
+        status: "pending"
+      });
+
+      if (error) {
+        console.error(error);
+        setStatus("과제 배부 중 오류가 발생했습니다.", "error");
+        return;
+      }
+
+      setStatus(`[${student.name}]에게 과제를 배부했습니다.`, "ok");
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await sb.auth.signOut();
+      window.location.href = "index.html";
+    });
+
+    (async () => {
+      const user = await requireAdmin();
+      if (!user) return;
+      await loadStudents();
+    })();
+  </script>
 </body>
 </html>

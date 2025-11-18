@@ -1,59 +1,232 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>평내 에듀플렉스 과제제출</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <title>평내 에듀플렉스 과제제출 - 로그인</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #e0f2fe, #f5f5ff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px 32px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      text-align: center;
+    }
+    .subtitle {
+      margin-top: 6px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #6b7280;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+    input {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    button {
+      flex: 1;
+      padding: 9px 10px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #login-btn {
+      background: #2563eb;
+      color: #fff;
+    }
+    #signup-btn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .status {
+      margin-top: 12px;
+      font-size: 13px;
+      min-height: 18px;
+    }
+    .status.error { color: #dc2626; }
+    .status.ok { color: #16a34a; }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <div class="card">
-      <!-- 헤더: 제목 + 날짜 -->
-      <header class="app-header" style="flex-direction: column; align-items: center;">
-        <div class="app-title" style="text-align:center;">
-          <div class="app-title-main" style="font-size: 26px;">평내 에듀플렉스 과제제출</div>
-          <div class="app-title-sub">제출한 과제를 확인할 수 있어요.</div>
-        </div>
+  <div class="card">
+    <h1>평내 에듀플렉스 과제제출</h1>
+    <p class="subtitle">회원가입 후 로그인해서 과제를 제출하세요.</p>
 
-        <div style="margin-top: 10px;">
-          <div class="app-date-pill">
-            오늘 날짜: <span id="today"></span>
-          </div>
-        </div>
-      </header>
+    <label for="name">이름</label>
+    <input type="text" id="name" placeholder="예: 김에듀" />
 
-      <!-- 🔹 로그인/회원가입 (왼쪽) + 과제제출하기 버튼(오른쪽) 한 줄 -->
-      <div class="main-top-row" style="margin-top: 18px;">
-        <!-- 왼쪽: 로그인/회원가입/마이페이지/관리자 -->
-        <nav class="nav-bar" id="auth-area">
-          <a href="login.html" id="login-link">로그인</a>
-          <a href="signup.html" id="signup-link">회원가입</a>
-          <span id="welcome-user" style="display:none;"></span>
-          <a href="mypage.html" id="mypage-link" style="display:none;">마이페이지</a>
-          <a href="admin.html" id="admin-link" style="display:none;">관리자</a>
-        </nav>
+    <label for="email">이메일</label>
+    <input type="email" id="email" placeholder="이메일 입력" />
 
-        <!-- 오른쪽: 과제 제출 버튼 -->
-        <button id="write-btn" class="btn btn-primary">
-          ✏️ 과제 제출하기
-        </button>
-      </div>
+    <label for="password">비밀번호</label>
+    <input type="password" id="password" placeholder="비밀번호 입력" />
 
-      <!-- 리스트 영역 -->
-      <section style="margin-top: 10px;">
-        <div class="section-title">제출된 과제 목록</div>
-        <div id="posts" class="post-list"></div>
-        <div id="empty-state" class="empty-state" style="display:none;">
-          아직 제출된 과제가 없습니다. 첫 번째 인증샷의 주인공이 되어보세요!
-        </div>
-      </section>
+    <div class="btn-row">
+      <button id="login-btn">로그인</button>
+      <button id="signup-btn">회원가입</button>
     </div>
+
+    <div class="status" id="status"></div>
   </div>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/main.js"></script>
+  <script>
+    const SUPABASE_URL = "https://kxbyfldxcrdegnfmzgrm.supabase.co";     // 🔴 수정
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4YnlmbGR4Y3JkZWduZm16Z3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NDU4MDMsImV4cCI6MjA3OTAyMTgwM30.Fj_TNEHxWnHY4TbmGEFzowUJp-5X9Gn7-0eynr8cVr4";              // 🔴 수정
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("login-btn");
+    const signupBtn = document.getElementById("signup-btn");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(msg, type = "") {
+      statusEl.textContent = msg || "";
+      statusEl.classList.remove("error", "ok");
+      if (type) statusEl.classList.add(type);
+    }
+
+    // 이미 로그인 되어 있으면 바로 보내기
+    (async () => {
+      const { data, error } = await sb.auth.getUser();
+      if (error || !data.user) return;
+
+      const user = data.user;
+      const { data: profile, error: pErr } = await sb
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (pErr || !profile) return;
+
+      if (profile.role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "mypage.html";
+      }
+    })();
+
+    // 로그인
+    loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        setStatus("이메일과 비밀번호를 입력해 주세요.", "error");
+        return;
+      }
+
+      setStatus("로그인 중...", "ok");
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        setStatus("로그인 실패: " + error.message, "error");
+        return;
+      }
+
+      const user = data.user;
+
+      const { data: profile, error: pErr } = await sb
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (pErr || !profile) {
+        setStatus("프로필 정보가 없습니다. 관리자에게 문의하세요.", "error");
+        return;
+      }
+
+      if (profile.role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "mypage.html";
+      }
+    });
+
+    // 회원가입
+    signupBtn.addEventListener("click", async () => {
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!name || !email || !password) {
+        setStatus("이름, 이메일, 비밀번호를 모두 입력해 주세요.", "error");
+        return;
+      }
+
+      setStatus("회원가입 중...", "ok");
+
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) {
+        setStatus("회원가입 실패: " + error.message, "error");
+        return;
+      }
+
+      const user = data.user;
+      if (!user) {
+        setStatus("회원가입은 되었지만 이메일 인증이 필요할 수 있습니다.", "ok");
+        return;
+      }
+
+      const { error: pErr } = await sb.from("profiles").insert({
+        id: user.id,
+        name: name,
+        role: "student"
+      });
+
+      if (pErr) {
+        console.error(pErr);
+        setStatus("회원가입은 되었지만 프로필 저장 중 오류가 발생했습니다.", "error");
+        return;
+      }
+
+      setStatus("회원가입 완료! 이제 로그인 버튼을 눌러 접속하세요.", "ok");
+    });
+  </script>
 </body>
 </html>

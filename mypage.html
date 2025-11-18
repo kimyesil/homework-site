@@ -2,51 +2,467 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>마이페이지</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>마이페이지 - 평내 에듀플렉스 과제제출</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #e5edff;
+      margin: 0;
+      padding: 24px;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px 28px 28px;
+      box-shadow: 0 18px 45px rgba(15,23,42,0.18);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title-area h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+    .title-area p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .chip-date {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .btn-submit {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(37,99,235,0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-submit span.icon {
+      font-size: 16px;
+    }
+    .hello {
+      margin-top: 24px;
+      font-size: 14px;
+    }
+    .hello a {
+      margin-left: 8px;
+      font-size: 13px;
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .section-title {
+      margin-top: 22px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      min-height: 18px;
+    }
+    .status.error { color: #dc2626; }
+    .status.ok { color: #16a34a; }
+
+    .assignment-list, .post-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .assignment-card, .post-card {
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9fafb;
+    }
+    .assignment-main, .post-main {
+      font-size: 13px;
+    }
+    .assignment-title, .post-title {
+      font-weight: 600;
+    }
+    .assignment-due, .post-date {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .post-actions button {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+    .btn-edit { background: #e5e7eb; }
+    .btn-delete { background: #fecaca; }
+  </style>
 </head>
 <body>
-  <div class="app">
+  <div class="wrap">
     <div class="card">
-      <!-- 헤더 -->
-      <header class="app-header">
-        <div class="app-title">
-          <div class="app-title-main">마이페이지</div>
-          <div class="app-title-sub">나에게 배부된 과제와 학습 미션을 한 눈에 확인할 수 있어요.</div>
+      <div class="card-header">
+        <div class="title-area">
+          <h1>평내 에듀플렉스 과제제출</h1>
+          <p>제출한 과제를 확인할 수 있어요.</p>
+          <div class="chip-date" id="today-chip">오늘 날짜: -</div>
         </div>
-        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-          <div class="app-date-pill">
-            오늘 날짜: <span id="today"></span>
-          </div>
-          <nav class="nav-bar">
-            <a href="index.html">메인으로</a>
-            <a href="write.html">과제 제출</a>
-          </nav>
-        </div>
-      </header>
+        <button class="btn-submit" id="btn-submit">
+          <span class="icon">✏️</span>
+          과제 제출하기
+        </button>
+      </div>
 
-      <!-- 기본 정보 -->
-      <section style="margin-bottom:18px;">
-        <div class="section-title">내 정보</div>
-        <div id="user-info" class="main-summary">
-          <!-- mypage.js에서 채움 -->
-        </div>
-      </section>
+      <div class="hello">
+        <span id="hello-text">로그인 정보를 불러오는 중...</span>
+        <a href="index.html">로그아웃 / 로그인 화면</a>
+      </div>
 
-      <!-- 제출 예정 과제 -->
-      <section>
-        <div class="section-title">제출 예정 과제</div>
-        <div id="assign-list" class="post-list"></div>
-        <div id="assign-empty" class="empty-state" style="display:none;">
-          제출 예정인 과제가 없습니다. 매니저가 배부하는 과제가 이곳에 표시됩니다.
-        </div>
-      </section>
+      <div class="section-title">제출 예정 과제</div>
+      <div class="assignment-list" id="assignment-list"></div>
+
+      <div class="section-title">제출한 과제 목록</div>
+      <div class="status" id="status"></div>
+      <div class="post-list" id="post-list"></div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/mypage.js"></script>
+  <script>
+const SUPABASE_URL = "https://kxbyfldxcrdegnfmzgrm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4YnlmbGR4Y3JkZWduZm16Z3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NDU4MDMsImV4cCI6MjA3OTAyMTgwM30.Fj_TNEHxWnHY4TbmGEFzowUJp-5X9Gn7-0eynr8cVr4";  
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const todayChip = document.getElementById("today-chip");
+    const helloText = document.getElementById("hello-text");
+    const statusEl = document.getElementById("status");
+    const assignmentListEl = document.getElementById("assignment-list");
+    const postListEl = document.getElementById("post-list");
+    const submitBtn = document.getElementById("btn-submit");
+
+    let currentUser = null;
+    let currentProfile = null;
+
+    // 오늘 날짜 표시
+    (function showToday() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      todayChip.textContent = `오늘 날짜: ${yyyy}-${mm}-${dd}`;
+    })();
+
+    function setStatus(msg, type = "") {
+      statusEl.textContent = msg || "";
+      statusEl.classList.remove("error", "ok");
+      if (type) statusEl.classList.add(type);
+    }
+
+    // 로그인/프로필 확인
+    async function loadUserAndData() {
+      const { data, error } = await sb.auth.getUser();
+      if (error || !data.user) {
+        // 로그인 안 한 상태
+        currentUser = null;
+        currentProfile = null;
+        helloText.textContent = "로그인하지 않으면 열람 권한이 없습니다.";
+        setStatus("로그인 후 과제를 확인하거나 제출할 수 있습니다.", "error");
+        return;
+      }
+
+      currentUser = data.user;
+
+      const { data: profile, error: pErr } = await sb
+        .from("profiles")
+        .select("name, role")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (pErr || !profile) {
+        helloText.textContent = "프로필 정보를 불러오지 못했습니다.";
+        setStatus("프로필 정보를 확인해 주세요.", "error");
+        return;
+      }
+
+      currentProfile = profile;
+
+      if (profile.role === "admin") {
+        // 혹시 관리자가 잘못 들어왔으면 admin 페이지로
+        window.location.href = "admin.html";
+        return;
+      }
+
+      helloText.textContent = `${profile.name || currentUser.email}님 안녕하세요  마이페이지입니다.`;
+      setStatus("");
+
+      await loadAssignments();
+      await loadPosts();
+    }
+
+    // 제출 예정 과제 불러오기
+    async function loadAssignments() {
+      assignmentListEl.innerHTML = "";
+      if (!currentUser) return;
+
+      const { data, error } = await sb
+        .from("homework_assignments")
+        .select("id, title, description, due_date, status")
+        .eq("student_id", currentUser.id)
+        .eq("status", "pending")
+        .order("due_date", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        const div = document.createElement("div");
+        div.textContent = "과제를 불러오지 못했습니다.";
+        assignmentListEl.appendChild(div);
+        return;
+      }
+
+      if (!data.length) {
+        const div = document.createElement("div");
+        div.style.fontSize = "13px";
+        div.style.color = "#6b7280";
+        div.textContent = "제출 예정 과제가 없습니다.";
+        assignmentListEl.appendChild(div);
+        return;
+      }
+
+      data.forEach((a) => {
+        const card = document.createElement("div");
+        card.className = "assignment-card";
+
+        const main = document.createElement("div");
+        main.className = "assignment-main";
+
+        const title = document.createElement("div");
+        title.className = "assignment-title";
+        title.textContent = a.title;
+
+        const due = document.createElement("div");
+        due.className = "assignment-due";
+        due.textContent = a.due_date
+          ? `제출 기한: ${a.due_date}`
+          : "제출 기한: 없음";
+
+        main.appendChild(title);
+        if (a.description) {
+          const desc = document.createElement("div");
+          desc.style.fontSize = "12px";
+          desc.style.color = "#4b5563";
+          desc.textContent = a.description;
+          main.appendChild(desc);
+        }
+        main.appendChild(due);
+
+        card.appendChild(main);
+        assignmentListEl.appendChild(card);
+      });
+    }
+
+    // 내가 쓴 글(제출한 과제) 불러오기
+    async function loadPosts() {
+      postListEl.innerHTML = "";
+      if (!currentUser) return;
+
+      const { data, error } = await sb
+        .from("homework_posts")
+        .select("id, title, content, created_at, password, is_deleted")
+        .eq("user_id", currentUser.id)
+        .eq("is_deleted", false)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        setStatus("제출한 과제를 불러오지 못했습니다.", "error");
+        return;
+      }
+
+      if (!data.length) {
+        const div = document.createElement("div");
+        div.style.fontSize = "13px";
+        div.style.color = "#6b7280";
+        div.textContent = "아직 제출한 과제가 없습니다.";
+        postListEl.appendChild(div);
+        return;
+      }
+
+      data.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "post-card";
+
+        const main = document.createElement("div");
+        main.className = "post-main";
+        const title = document.createElement("div");
+        title.className = "post-title";
+        title.textContent = p.title;
+        const date = document.createElement("div");
+        date.className = "post-date";
+        date.textContent = new Date(p.created_at).toLocaleString("ko-KR");
+
+        const content = document.createElement("div");
+        content.style.fontSize = "12px";
+        content.style.color = "#4b5563";
+        content.style.marginTop = "4px";
+        content.textContent = p.content;
+
+        main.appendChild(title);
+        main.appendChild(date);
+        main.appendChild(content);
+
+        const actions = document.createElement("div");
+        actions.className = "post-actions";
+
+        const btnEdit = document.createElement("button");
+        btnEdit.textContent = "수정";
+        btnEdit.className = "btn-edit";
+        btnEdit.addEventListener("click", () => editPost(p));
+
+        const btnDelete = document.createElement("button");
+        btnDelete.textContent = "삭제";
+        btnDelete.className = "btn-delete";
+        btnDelete.addEventListener("click", () => deletePost(p));
+
+        actions.appendChild(btnEdit);
+        actions.appendChild(btnDelete);
+
+        card.appendChild(main);
+        card.appendChild(actions);
+
+        postListEl.appendChild(card);
+      });
+    }
+
+    // 과제 제출하기 (글 작성)
+    submitBtn.addEventListener("click", async () => {
+      if (!currentUser) {
+        alert("로그인하지 않으면 열람/작성 권한이 없습니다.");
+        setStatus("로그인 후 과제를 제출할 수 있습니다.", "error");
+        return;
+      }
+
+      const title = prompt("제출할 과제 제목을 입력하세요.");
+      if (!title) return;
+
+      const content = prompt("과제 내용을 입력하세요.");
+      if (!content) return;
+
+      const pw = prompt("수정/삭제용 비밀번호를 입력하세요. (없으면 그냥 엔터)");
+
+      const { error } = await sb.from("homework_posts").insert({
+        user_id: currentUser.id,
+        title,
+        content,
+        password: pw || null,
+        is_deleted: false
+      });
+
+      if (error) {
+        console.error(error);
+        setStatus("과제 제출 중 오류가 발생했습니다.", "error");
+        return;
+      }
+
+      setStatus("과제를 제출했습니다.", "ok");
+      await loadPosts();
+    });
+
+    // 글 수정
+    async function editPost(post) {
+      if (!currentUser) {
+        alert("로그인하지 않으면 열람/작성 권한이 없습니다.");
+        return;
+      }
+
+      if (post.password) {
+        const pw = prompt("이 글의 비밀번호를 입력하세요.");
+        if (pw !== post.password) {
+          alert("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+      }
+
+      const newContent = prompt("새로운 내용을 입력하세요.", post.content);
+      if (!newContent) return;
+
+      const { error } = await sb
+        .from("homework_posts")
+        .update({ content: newContent })
+        .eq("id", post.id)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error(error);
+        setStatus("수정 중 오류가 발생했습니다.", "error");
+        return;
+      }
+
+      setStatus("글을 수정했습니다.", "ok");
+      await loadPosts();
+    }
+
+    // 글 삭제 (is_deleted = true)
+    async function deletePost(post) {
+      if (!currentUser) {
+        alert("로그인하지 않으면 열람/작성 권한이 없습니다.");
+        return;
+      }
+
+      if (post.password) {
+        const pw = prompt("이 글의 비밀번호를 입력하세요.");
+        if (pw !== post.password) {
+          alert("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+      }
+
+      const okDelete = confirm("정말 삭제하시겠습니까?");
+      if (!okDelete) return;
+
+      const { error } = await sb
+        .from("homework_posts")
+        .update({ is_deleted: true })
+        .eq("id", post.id)
+        .eq("user_id", currentUser.id);
+
+      if (error) {
+        console.error(error);
+        setStatus("삭제 중 오류가 발생했습니다.", "error");
+        return;
+      }
+
+      setStatus("글을 삭제했습니다.", "ok");
+      await loadPosts();
+    }
+
+    // 처음 로드
+    loadUserAndData();
+  </script>
 </body>
 </html>
